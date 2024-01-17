@@ -32,6 +32,6 @@ public class Cart {
             name = "cart_id",
             referencedColumnName = "cart_id"
     )
-    private List<Product> products;
+    private List<CartItems> cart;
 
 }
