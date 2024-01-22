@@ -1,6 +1,6 @@
 package com.project.sokoni.services;
 
-import com.project.sokoni.DTOs.CategoryDto;
+import com.project.sokoni.DTOs.PageObject;
 import com.project.sokoni.DTOs.ProductDto;
 import com.project.sokoni.models.Category;
 import com.project.sokoni.models.Product;
@@ -8,12 +8,15 @@ import com.project.sokoni.repositories.CategoryRepository;
 import com.project.sokoni.repositories.ProductRepository;
 import com.smattme.requestvalidator.RequestValidator;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Objects;
 
 @Slf4j
 @Service
@@ -55,10 +58,70 @@ public class ProductServiceImpl implements ProductService {
             response.put("status", true);
         }
         catch (Exception e){
-            log.error("Something went wrong---->"+e.getMessage());
+            log.error("Something went wrong while saving a product---->"+e.getMessage());
             e.printStackTrace();
             response.put("message", "Something went wrong");
             response.put("status","false");
+        }
+        return response;
+    }
+
+
+    @Override
+    public HashMap getAllProducts(PageObject pageObject) {
+
+        HashMap<String, Object> response = new HashMap<>();
+        try {
+            PageRequest page = PageRequest.of(pageObject.getPageNumber(), pageObject.getPageSize(), Sort.by("createdAt").descending());
+            Page<Product> products =  productRepository.findAll(page);
+            response.put("message", "Data retrieved successully");
+            response.put("data", products);
+            response.put("status", true);
+
+        }catch (Exception e){
+            e.printStackTrace();
+            response.put("message", "Something went wrong");
+            response.put("status", false);
+            log.error("Something went wrong while getting all products---->"+e.getMessage());
+        }
+        return  response;
+    }
+
+    @Override
+    public HashMap getProduct(Long id) {
+        HashMap<String, Object> response = new HashMap<>();
+        try {
+            Product product = productRepository.findById(id).orElseThrow(()-> new IllegalStateException("Product with the given id does not exist"));
+            response.put("message", "product retrieved successfully");
+            response.put("status", true);
+            response.put("data", product);
+
+        }catch (Exception e){
+            e.printStackTrace();
+            log.error("An error occurred while getting single product---->"+e.getMessage());
+            response.put("message", "Something went wrong");
+            response.put("status", false);
+        }
+        return response;
+    }
+
+    @Override
+    public HashMap deleteProduct(Long id) {
+        HashMap<String, Object> response = new HashMap<>();
+        try {
+
+            Product product = productRepository.findById(id).orElseThrow(()-> new IllegalStateException("No product with the given id given to be deleted-"));
+            response.put("message", "product deleted successfully");
+            response.put("status", true);
+            response.put("data", product);
+
+        }
+        catch (Exception e){
+            e.printStackTrace();
+            log.error("An error occurred while deleting a product"+e.getMessage());
+            response.put("message", "Something went wrong while deleting a product");
+            response.put("status", false);
+
         }
         return response;
     }
@@ -98,4 +161,5 @@ public class ProductServiceImpl implements ProductService {
             return response;
         }
     }
+
 }
