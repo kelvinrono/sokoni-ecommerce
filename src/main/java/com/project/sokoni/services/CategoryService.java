@@ -1,6 +1,7 @@
 package com.project.sokoni.services;
 
 import com.project.sokoni.DTOs.CategoryDto;
+import com.project.sokoni.DTOs.PageObject;
 import com.project.sokoni.models.Category;
 import com.project.sokoni.responses.Message;
 
@@ -13,4 +14,9 @@ public interface CategoryService {
     HashMap validateCategory(CategoryDto categoryDto);
 
 
+    HashMap getAllCategories(PageObject pageObject);
+
+    HashMap getCategory(Long id);
+
+    HashMap deleteCategory(Long id);
 }

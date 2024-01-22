@@ -1,12 +1,18 @@
 package com.project.sokoni.services;
 
 import com.project.sokoni.DTOs.CategoryDto;
+import com.project.sokoni.DTOs.PageObject;
 import com.project.sokoni.models.Category;
+import com.project.sokoni.models.Product;
 import com.project.sokoni.repositories.CategoryRepository;
 import com.smattme.requestvalidator.RequestValidator;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.awt.print.Pageable;
 import java.util.HashMap;
 import java.util.List;
 
@@ -77,5 +83,64 @@ public class CategoryServiceImpl implements CategoryService {
 
             return response;
         }
+    }
+
+    @Override
+    public HashMap getAllCategories(PageObject pageObject) {
+
+        HashMap<String, Object> response = new HashMap<>();
+        try {
+            PageRequest page = PageRequest.of(pageObject.getPageNumber(), pageObject.getPageSize(), Sort.by("createdAt").descending());
+            Page<Category> categories = categoryRepository.findAll(page);
+
+            response.put("message", "Categories retrived successfully");
+            response.put("status", "true");
+            response.put("data", response);
+        }
+        catch (Exception e){
+            e.printStackTrace();
+            response.put("message", "Oops! Something went went wrong!");
+            response.put("status", true);
+            log.error("Something went wrong while fetching categories------------------>"+ e.getMessage());
+        }
+        return response;
+    }
+
+    @Override
+    public HashMap getCategory(Long id) {
+        HashMap<String, Object> response = new HashMap<>();
+        try {
+            Category category = categoryRepository.findById(id).orElseThrow(()-> new IllegalStateException("Category with the given id does not exist"));
+            response.put("message", "Category retrieved successfully");
+            response.put("status", true);
+            response.put("data", category);
+
+        }catch (Exception e){
+            e.printStackTrace();
+            log.error("An error occurred while getting single product---->"+e.getMessage());
+            response.put("message", "Something went wrong");
+            response.put("status", false);
+        }
+        return response;
+    }
+
+    @Override
+    public HashMap deleteCategory(Long id) {
+        HashMap<String, Object> response = new HashMap<>();
+        try {
+
+            Category product = categoryRepository.findById(id).orElseThrow(()-> new IllegalStateException("No Category with the given id given to be deleted-"));
+            categoryRepository.delete(product);
+            response.put("message", "category deleted successfully");
+            response.put("status", true);
+
+        }
+        catch (Exception e){
+            e.printStackTrace();
+            log.error("An error occurred while deleting a category"+e.getMessage());
+            response.put("message", "Oops! Something went wrong");
+            response.put("status", false);
+        }
+        return response;
     }
 }

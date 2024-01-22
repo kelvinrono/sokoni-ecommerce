@@ -111,9 +111,9 @@ public class ProductServiceImpl implements ProductService {
         try {
 
             Product product = productRepository.findById(id).orElseThrow(()-> new IllegalStateException("No product with the given id given to be deleted-"));
+            productRepository.delete(product);
             response.put("message", "product deleted successfully");
             response.put("status", true);
-            response.put("data", product);
 
         }
         catch (Exception e){
