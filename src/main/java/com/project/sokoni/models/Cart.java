@@ -2,6 +2,7 @@ package com.project.sokoni.models;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -12,6 +13,7 @@ import java.util.List;
 @Entity
 @Table(name = "cart")
 @Data
+@Builder
 public class Cart {
 
     @Id
@@ -25,6 +27,7 @@ public class Cart {
             referencedColumnName = "user_id")
     private User user;
 
+
     @OneToMany(
             cascade = CascadeType.ALL
     )
@@ -32,6 +35,16 @@ public class Cart {
             name = "cart_id",
             referencedColumnName = "cart_id"
     )
-    private List<CartItems> cart;
+    private List<CartItem> cartItems;
+
+//    @OneToMany(
+//            cascade = CascadeType.ALL
+//    )
+//    @JoinColumn(
+//            name = "cart_id",
+//            referencedColumnName = "cart_id"
+//    )
+//    private List<Product> cart;
+
 
 }

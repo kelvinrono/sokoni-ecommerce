@@ -44,5 +44,11 @@ public class ProductController {
         return productService.deleteProduct(id);
     }
 
+    @PostMapping("/add-to-cart")
+    public HashMap addToCart(@RequestParam("productId") Long productId, @RequestParam("userId") Long userId){
+        log.info("Incoming request for adding to cart----> id: "+productId);
+        return productService.addToCart(productId, userId);
+    }
+
 
 }

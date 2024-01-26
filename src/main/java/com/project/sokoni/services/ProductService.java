@@ -14,4 +14,6 @@ public interface ProductService {
     HashMap getProduct(Long id);
 
     HashMap deleteProduct(Long id);
+
+    HashMap addToCart(Long id, Long userId);
 }

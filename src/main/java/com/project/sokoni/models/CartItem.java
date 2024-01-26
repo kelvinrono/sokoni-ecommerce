@@ -7,21 +7,24 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.Instant;
+import java.util.List;
 
+@Entity
 @AllArgsConstructor
 @NoArgsConstructor
-@Entity
-@Table(name = "categories")
+@Table(name = "cart_items")
 @Data
-public class Category {
+public class CartItem {
 
-    @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "category_id")
-    private Long categoryId;
+    @Id
+    private Long id;
 
-    private String name;
-    private String description;
+    @OneToOne()
+    @JoinColumn(name = "product_id")
+    private Product product;
+
+    private Integer quantity;
 
     @CreationTimestamp
     @Column(name = "created_at")

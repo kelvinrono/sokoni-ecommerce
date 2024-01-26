@@ -25,9 +25,10 @@ public class CategoryController {
 
 
     @GetMapping("/get-all-categories")
-    public HashMap getAllProducts(@RequestBody PageObject pageObject){
-        log.info("----------Incoming request for getting all the categories--------------"+pageObject);
-        return categoryService.getAllCategories(pageObject);
+    public HashMap getAllProducts(@RequestParam("pageSize") int pageSize,
+                                  @RequestParam("pageNumber") int pageNumber){
+        log.info(String.format("----------Incoming request for getting all the categories--------------pageNumber = %d,pageSize %d ",pageNumber, pageSize));
+        return categoryService.getAllCategories(pageNumber, pageSize);
     }
 
     @GetMapping("/get-product/{id}")

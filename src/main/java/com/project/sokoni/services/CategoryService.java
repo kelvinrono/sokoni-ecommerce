@@ -14,7 +14,7 @@ public interface CategoryService {
     HashMap validateCategory(CategoryDto categoryDto);
 
 
-    HashMap getAllCategories(PageObject pageObject);
+    HashMap getAllCategories(int pageNumber, int pageSize);
 
     HashMap getCategory(Long id);
 

@@ -86,11 +86,11 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public HashMap getAllCategories(PageObject pageObject) {
+    public HashMap getAllCategories(int pageNumber, int pageSize) {
 
         HashMap<String, Object> response = new HashMap<>();
         try {
-            PageRequest page = PageRequest.of(pageObject.getPageNumber(), pageObject.getPageSize(), Sort.by("createdAt").descending());
+            PageRequest page = PageRequest.of(pageNumber, pageSize, Sort.by("createdAt").descending());
             Page<Category> categories = categoryRepository.findAll(page);
 
             response.put("message", "Categories retrived successfully");

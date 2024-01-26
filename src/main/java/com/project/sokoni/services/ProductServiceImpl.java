@@ -2,10 +2,8 @@ package com.project.sokoni.services;
 
 import com.project.sokoni.DTOs.PageObject;
 import com.project.sokoni.DTOs.ProductDto;
-import com.project.sokoni.models.Category;
-import com.project.sokoni.models.Product;
-import com.project.sokoni.repositories.CategoryRepository;
-import com.project.sokoni.repositories.ProductRepository;
+import com.project.sokoni.models.*;
+import com.project.sokoni.repositories.*;
 import com.smattme.requestvalidator.RequestValidator;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -17,6 +15,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -24,9 +23,22 @@ public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
 
-    public ProductServiceImpl(ProductRepository productRepository, CategoryRepository categoryRepository) {
+    private final CartRepository cartRepository;
+    private final CartItemRepository cartItemRepository;
+    private final UserRepository userRepository;
+
+
+    public ProductServiceImpl(ProductRepository productRepository,
+                              CategoryRepository categoryRepository,
+                              CartRepository cartRepository,
+                              CartItemRepository cartItemRepository,
+                              UserRepository userRepository
+    ) {
         this.productRepository = productRepository;
         this.categoryRepository = categoryRepository;
+        this.cartRepository = cartRepository;
+        this.cartItemRepository = cartItemRepository;
+        this.userRepository = userRepository;
     }
 
     @Override
@@ -49,6 +61,8 @@ public class ProductServiceImpl implements ProductService {
                 Category category = categoryRepository.findById(id).orElseThrow(() -> new IllegalStateException("Category with that id does not exist"));
                 categories.add(category);
             }
+
+            product.setCategory(categories);
 
             productRepository.save(product);
 
@@ -161,5 +175,53 @@ public class ProductServiceImpl implements ProductService {
             return response;
         }
     }
+
+    @Override
+    public HashMap addToCart(Long productId, Long userId) {
+
+        HashMap<String, Object> response = new HashMap<>();
+        List<CartItem> cartItems = new ArrayList<>();
+
+        CartItem cartItem = new CartItem();
+        try {
+            User user = userRepository.findById(userId).orElseThrow(()-> new IllegalStateException("User with the given id does not exist"));
+            Product product = productRepository.findById(productId).orElseThrow(()-> new IllegalStateException("Product with the given id does not exist"));
+            Optional<Cart> existingCart = cartRepository.findByUser(user);
+
+            cartItem.setProduct(product);
+            cartItemRepository.save(cartItem);
+            log.info("-----Cart item saved successfully-------------");
+            cartItems.add(cartItem);
+
+            if(existingCart.isEmpty()){
+                Cart cart = Cart.builder()
+                        .cartItems(cartItems)
+                        .user(user)
+                        .build();
+                cartRepository.save(cart);
+
+                log.info(String.format("----New cart has been saved successfully for user %s-----", user.toString()));
+            } else {
+                Optional<CartItem> item = cartRepository.findByCartIdAndAndUser(existingCart.get().getCartId(), user);
+
+
+                existingCart.get().setCartItems(cartItems);
+                log.info(String.format("---- has been saved successfully for user %s-----", user.toString()));
+
+            }
+
+            response.put("message", "product added too cart");
+            response.put("status", true);
+
+        }
+        catch (Exception e){
+            e.printStackTrace();
+            log.error("Something went wrong while adding to the cart"+ e.getMessage());
+            response.put("message", "Oops! Something went wrong");
+            response.put("status", false);
+        }
+        return response;
+    }
+
 
 }
